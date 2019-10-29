@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 
 def long_way(interval, duration, rate):
@@ -17,6 +18,25 @@ def long_way(interval, duration, rate):
     all_times = [1 if np.random.random() < chance_there_is_spike else 0 for _ in range(0, int(window_count))]
     result = [index * interval for index, has_spike in enumerate(all_times) if has_spike == 1]
     return result
+
+
+def refractory(duration, base_rate, tau_ref):
+    """
+    Generates spikes with a refractory period.
+    :param duration: The duration we are generating spikes for (in ms).
+    :param base_rate: The starting rate we use to generate spikes. Changes over time due to a refractory period.
+    :param tau_ref: The constant used to control the refractory recovery rate.
+    :return: An array of times (in ms) where a spike occurs.
+    """
+    spikes = []
+    for t in range(1, duration):
+        time_since_last_spike = 1000000 if len(spikes) == 0 else t - spikes[-1]
+        rate = base_rate * (1 - np.exp(- time_since_last_spike / tau_ref))
+        was_spike = np.random.random() < rate
+        if was_spike:
+            spikes.append(t)
+
+    return spikes
 
 
 def short_way(duration, rate):

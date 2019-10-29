@@ -1,4 +1,3 @@
-import functools
 import numpy as np
 
 
@@ -23,7 +22,7 @@ def coefficient_of_variation(spike_times):
 
 def fano_factor(interval, duration, spikes):
     """
-    Computes the fano factor for a list of Trials.
+    Computes the fano factor for a list of spikes.
     :param interval: Length of the bucket we're evaluating (in ms).
     :param duration: The duration of the trial (in ms).
     :param spikes: The times at which each spike occurs (in ms).
