@@ -11,12 +11,14 @@ def long_way(interval, duration, rate):
     :param interval: Length of time we're testing for (to determine if it should have a spike) in ms.
     :param duration: The duration we are generating spikes for (in ms).
     :param rate: The maximum/constant rate over which we are creating spikes (in mHz).
-    :return: An array of times (in ms) where a spike occurs.
+    :return: A list of times (in ms) where a spike occurs.
     """
     window_count = duration / interval
     chance_there_is_spike = rate * interval
-    all_times = [1 if np.random.random() < chance_there_is_spike else 0 for _ in range(0, int(window_count))]
-    result = [index * interval for index, has_spike in enumerate(all_times) if has_spike == 1]
+    all_times = [1 if np.random.random(
+    ) < chance_there_is_spike else 0 for _ in range(0, int(window_count))]
+    result = [index * interval for index,
+              has_spike in enumerate(all_times) if has_spike == 1]
     return result
 
 
@@ -26,7 +28,7 @@ def refractory(duration, base_rate, tau_ref):
     :param duration: The duration we are generating spikes for (in ms).
     :param base_rate: The starting rate we use to generate spikes. Changes over time due to a refractory period.
     :param tau_ref: The constant used to control the refractory recovery rate.
-    :return: An array of times (in ms) where a spike occurs.
+    :return: A list of times (in ms) where a spike occurs.
     """
     spikes = []
     for t in range(1, duration):
@@ -39,15 +41,32 @@ def refractory(duration, base_rate, tau_ref):
     return spikes
 
 
-def short_way(duration, rate):
+def variable(duration: int):
+    """
+    Generates spikes with a refractory period.
+    where r(t) = 100(1 + cos(2 * pi * t / 25ms)) Hz.
+    :param duration: The duration we are generating spikes for (in ms).
+    :return: A list of times (in ms) where a spike occurs.
+    """
+    spikes = []
+    for t in range(1, duration):
+        rate = 100 * (1 + math.cos(2 * math.pi * t / 25))
+        was_spike = np.random.random() < rate
+        if was_spike:
+            spikes.append(t)
+
+    return spikes
+
+
+def short_way(duration: int, rate: float):
     """
     This is the short way of generating spikes.
-    By itself, it only works for constant firing rates. Combine with spike thinning to have it work with other
-    situations.
+    By itself, it only works for constant firing rates. Combine with spike
+    thinning to have it work with other situations.
     Contrast with the long way.
     :param duration: The duration we are generating spikes for (in ms).
     :param rate: The maximum/constant rate over which we are creating spikes (in mHz).
-    :return: An array of times (in ms) where a spike occurs.
+    :return: A list of times (in ms) where a spike occurs.
     """
     t = 0
     times = []
